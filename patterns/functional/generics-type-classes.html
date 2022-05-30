@@ -1,0 +1,425 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js rust">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>타입 클래스로서의 제네릭(Generics as Type Classes) - Rust Design Patterns</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="A catalogue of Rust design patterns, anti-patterns and idioms">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "rust";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('rust')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../intro.html"><strong aria-hidden="true">1.</strong> 소개(Introduction)</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../translations.html"><strong aria-hidden="true">1.1.</strong> 번역(Translations)</a></li></ol></li><li class="chapter-item expanded "><a href="../idioms/index.html"><strong aria-hidden="true">2.</strong> 관용구(Idioms)</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../idioms/coercion-arguments.html"><strong aria-hidden="true">2.1.</strong> 인자에 차용 타입 사용하기(Use borrowed types for arguments)</a></li><li class="chapter-item expanded "><a href="../idioms/concat-format.html"><strong aria-hidden="true">2.2.</strong> format!으로 문자열 연결(Concatenating Strings with format!)</a></li><li class="chapter-item expanded "><a href="../idioms/ctor.html"><strong aria-hidden="true">2.3.</strong> 생성자(Constructor)</a></li><li class="chapter-item expanded "><a href="../idioms/default.html"><strong aria-hidden="true">2.4.</strong> 디폴트 트레잇(The Default Trait)</a></li><li class="chapter-item expanded "><a href="../idioms/deref.html"><strong aria-hidden="true">2.5.</strong> 컬렉션은 스마트 포인터입니다(Collections Are Smart Pointers)</a></li><li class="chapter-item expanded "><a href="../idioms/dtor-finally.html"><strong aria-hidden="true">2.6.</strong> Finalisation in Destructors</a></li><li class="chapter-item expanded "><a href="../idioms/mem-replace.html"><strong aria-hidden="true">2.7.</strong> mem::{take(_), replace(_)}</a></li><li class="chapter-item expanded "><a href="../idioms/on-stack-dyn-dispatch.html"><strong aria-hidden="true">2.8.</strong> On-Stack Dynamic Dispatch</a></li><li class="chapter-item expanded "><a href="../idioms/ffi/intro.html"><strong aria-hidden="true">2.9.</strong> Foreign function interface (FFI)</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../idioms/ffi/errors.html"><strong aria-hidden="true">2.9.1.</strong> Idiomatic Errors</a></li><li class="chapter-item expanded "><a href="../idioms/ffi/accepting-strings.html"><strong aria-hidden="true">2.9.2.</strong> Accepting Strings</a></li><li class="chapter-item expanded "><a href="../idioms/ffi/passing-strings.html"><strong aria-hidden="true">2.9.3.</strong> Passing Strings</a></li></ol></li><li class="chapter-item expanded "><a href="../idioms/option-iter.html"><strong aria-hidden="true">2.10.</strong> Iterating over an Option</a></li><li class="chapter-item expanded "><a href="../idioms/pass-var-to-closure.html"><strong aria-hidden="true">2.11.</strong> Pass Variables to Closure</a></li><li class="chapter-item expanded "><a href="../idioms/priv-extend.html"><strong aria-hidden="true">2.12.</strong> Privacy For Extensibility</a></li><li class="chapter-item expanded "><a href="../idioms/rustdoc-init.html"><strong aria-hidden="true">2.13.</strong> Easy doc initialization</a></li><li class="chapter-item expanded "><a href="../idioms/temporary-mutability.html"><strong aria-hidden="true">2.14.</strong> Temporary mutability</a></li></ol></li><li class="chapter-item expanded "><a href="../patterns/index.html"><strong aria-hidden="true">3.</strong> 디자인 패턴(Design Patterns)</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../patterns/behavioural/intro.html"><strong aria-hidden="true">3.1.</strong> 행동 패턴(Behavioural)</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../patterns/behavioural/command.html"><strong aria-hidden="true">3.1.1.</strong> 커맨드 디자인 패턴(Command)</a></li><li class="chapter-item expanded "><a href="../patterns/behavioural/interpreter.html"><strong aria-hidden="true">3.1.2.</strong> Interpreter</a></li><li class="chapter-item expanded "><a href="../patterns/behavioural/newtype.html"><strong aria-hidden="true">3.1.3.</strong> Newtype</a></li><li class="chapter-item expanded "><a href="../patterns/behavioural/RAII.html"><strong aria-hidden="true">3.1.4.</strong> RAII Guards</a></li><li class="chapter-item expanded "><a href="../patterns/behavioural/strategy.html"><strong aria-hidden="true">3.1.5.</strong> Strategy</a></li><li class="chapter-item expanded "><a href="../patterns/behavioural/visitor.html"><strong aria-hidden="true">3.1.6.</strong> Visitor</a></li></ol></li><li class="chapter-item expanded "><a href="../patterns/creational/intro.html"><strong aria-hidden="true">3.2.</strong> Creational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../patterns/creational/builder.html"><strong aria-hidden="true">3.2.1.</strong> Builder</a></li><li class="chapter-item expanded "><a href="../patterns/creational/fold.html"><strong aria-hidden="true">3.2.2.</strong> Fold</a></li></ol></li><li class="chapter-item expanded "><a href="../patterns/structural/intro.html"><strong aria-hidden="true">3.3.</strong> Structural</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../patterns/structural/compose-structs.html"><strong aria-hidden="true">3.3.1.</strong> Compose Structs</a></li><li class="chapter-item expanded "><a href="../patterns/structural/small-crates.html"><strong aria-hidden="true">3.3.2.</strong> Prefer Small Crates</a></li><li class="chapter-item expanded "><a href="../patterns/structural/unsafe-mods.html"><strong aria-hidden="true">3.3.3.</strong> Contain unsafety in small modules</a></li></ol></li><li class="chapter-item expanded "><a href="../patterns/ffi/intro.html"><strong aria-hidden="true">3.4.</strong> Foreign function interface (FFI)</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../patterns/ffi/export.html"><strong aria-hidden="true">3.4.1.</strong> Object-Based APIs</a></li><li class="chapter-item expanded "><a href="../patterns/ffi/wrappers.html"><strong aria-hidden="true">3.4.2.</strong> Type Consolidation into Wrappers</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../anti_patterns/index.html"><strong aria-hidden="true">4.</strong> Anti-patterns</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../anti_patterns/borrow_clone.html"><strong aria-hidden="true">4.1.</strong> Clone to satisfy the borrow checker</a></li><li class="chapter-item expanded "><a href="../anti_patterns/deny-warnings.html"><strong aria-hidden="true">4.2.</strong> #[deny(warnings)]</a></li><li class="chapter-item expanded "><a href="../anti_patterns/deref.html"><strong aria-hidden="true">4.3.</strong> Deref Polymorphism</a></li></ol></li><li class="chapter-item expanded "><a href="../functional/index.html"><strong aria-hidden="true">5.</strong> 함수형 프로그래밍(Functional Programming)</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../functional/paradigms.html"><strong aria-hidden="true">5.1.</strong> 프로그래밍 패러다임(Programming paradigms)</a></li><li class="chapter-item expanded "><a href="../functional/generics-type-classes.html" class="active"><strong aria-hidden="true">5.2.</strong> 타입 클래스로서의 제네릭(Generics as Type Classes)</a></li></ol></li><li class="chapter-item expanded "><a href="../additional_resources/index.html"><strong aria-hidden="true">6.</strong> 추가 리소스(Additional Resources)</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../additional_resources/design-principles.html"><strong aria-hidden="true">6.1.</strong> 설계 원칙(Design principles)</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Rust Design Patterns</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/rust-unofficial/patterns" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="타입-클래스로서의-제네릭generics-as-type-classes"><a class="header" href="#타입-클래스로서의-제네릭generics-as-type-classes">타입 클래스로서의 제네릭(Generics as Type Classes)</a></h1>
+<h2 id="설명description"><a class="header" href="#설명description">설명(Description)</a></h2>
+<p>Rust의 타입 시스템은 명령형 언어(예: Java 및 C++)보다는 함수형 언어(예: Haskell)처럼 설계되었습니다. 결과적으로, Rust는 많은 종류의 프로그래밍 문제를 &quot;정적 타이핑(static typing)&quot; 문제로 바꿀 수 있습니다. 이것은 함수형 언어 선택의 가장 큰 승리 중 하나이며 Rust의 컴파일 시간 보장에 매우 중요합니다.</p>
+<p>이 아이디어의 핵심 부분은 제네릭 타입이 작동하는 방식입니다. 예를 들어 C++ 및 Java에서 제네릭 타입은 컴파일러를 위한 메타 프로그래밍 생성자(construct)입니다. C++에서의 <code>vector&lt;int&gt;</code>와 <code>vector&lt;char&gt;</code>는 두 개의 다른 타입이 채워진 (<code>template(템플릿)</code>으로 알려진)<code>vector</code> 타입에 대한 동일한 상용구(boilerplate) 코드의 두 개의 다른 사본일 뿐입니다.</p>
+<p>In Rust, a generic type parameter creates what is known in functional languages as a &quot;type class constraint&quot;, and each different parameter filled in by an end user <em>actually changes the type</em>. In other words, <code>Vec&lt;isize&gt;</code> and <code>Vec&lt;char&gt;</code> <em>are two different types</em>, which are recognized as distinct by all parts of the type system.
+Rust에서 제네릭 타입 매개변수는 함수형 언어에서 &quot;타입 클래스 제약(type class constraint)&quot;과 최종 사용자 <em>실제로 타입을 변경</em>에 의해 채운 각각의 다른 매개변수를 생성합니다. 즉, <code>Vec&lt;isize&gt;</code>와 <code>Vec&lt;char&gt;</code>는 <em>두 개의 다른 타입들</em>이며 타입 시스템의 모든 부분에서 구별되는 것으로 인식됩니다.</p>
+<p>This is called <strong>monomorphization</strong>, where different types are created from <strong>polymorphic</strong> code.  This special behavior requires <code>impl</code> blocks to specify generic parameters: different values for the generic type cause different types, and different types can have different <code>impl</code> blocks.
+이것은 **단형화(monomorphization)**라고 하며, 다른 타입들이 <strong>다형(polymorphic)</strong> 코드로부터 생성되어집니다. 이 특별한 동작은 제네릭 매개변수를 지정하기 위해 <code>impl</code> 블록이 필요합니다. 제네릭 타입에 대한 다른 값은 다른 타입들을 유발하고 다른 타입들은 다른 <code>impl</code> 블록들을 가질 수 있습니다.</p>
+<p>In object-oriented languages, classes can inherit behavior from their parents. However, this allows the attachment of not only additional behavior to particular members of a type class, but extra behavior as well.
+객체 지향 언어에서 클래스는 그들의 부모로부터 동작을 상속할 수 있습니다. 그러나 이것은 통해 타입 클래스의 특정 멤버에 대한 추가적인 동작뿐만 아니라 추가 동작도 첨부할 수 있습니다.</p>
+<p>The nearest equivalent is the runtime polymorphism in Javascript and Python, where new members can be added to objects willy-nilly by any constructor. Unlike those languages, however, all of Rust's additional methods can be type checked when they are used, because their generics are statically defined. That makes them more usable while remaining safe.
+가장 가까운 것은 자바스크립트와 파이썬의 런타임 다형성으로, 어떤 생성자라도 기꺼이 새 멤버를 객체에 추가할 수 있습니다. 그러나 이러한 언어와 달리 Rust의 모든 추가적인 메서드들은 제네릭이 정적으로 정의되어 있기 때문에 사용할 때 타입 검사를 받을 수 있습니다. 따라서 안전하게 유지하면서 더 유용하게 만들 수 있습니다.</p>
+<h2 id="예제example"><a class="header" href="#예제example">예제(Example)</a></h2>
+<p>일련의 연구실 머신을 위한 스토리지 서버를 설계한다고 가정합니다. 관련된 소프트웨어 때문에 BOOTP(PXE 네트워크 부팅용)와 NFS(원격 마운트 스토리지용)의 두 가지 다른 프로토콜을 지원해야 합니다.</p>
+<p>당신의 목표는 둘 다 처리할 수 있는 Rust로 작성된 하나의 프로그램을 갖는 것입니다. 프로토콜 핸들러가 있고 두 종류의 요청을 모두 수신합니다. 그러면 main 응용 프로그램 로직은 실제 파일에 대한 저장소 및 보안 제어를 구성하기 위해서 실험실 관리자를 허락하게 될 것 입니다.</p>
+<p>실험실에 있는 시스템의 파일에 대한 요청에는 어떤 프로토콜에서 왔는지에 관계없이 동일한 기본 정보(인증 방법과 검색할 파일 이름)를 포함합니다. 간단한 구현은 다음과 같습니다.</p>
+<pre><code class="language-rust ignore">
+enum AuthInfo {
+    Nfs(crate::nfs::AuthInfo),
+    Bootp(crate::bootp::AuthInfo),
+}
+
+struct FileDownloadRequest {
+    file_name: PathBuf,
+    authentication: AuthInfo,
+}
+</code></pre>
+<p>This design might work well enough. But now suppose you needed to support adding metadata that was <em>protocol specific</em>. For example, with NFS, you wanted to determine what their mount point was in order to enforce additional security rules.
+이 디자인은 충분히 효과가 있을 수 있습니다. 그러나 이제 <em>프로토콜에 특정한</em> 메타데이터 추가를 지원해야 한다고 가정합니다. 예를 들어 NFS의 경우 추가 보안 규칙을 적용하기 위해 마운트 지점이 무엇인지 확인하려고 했습니다.</p>
+<p>The way the current struct is designed leaves the protocol decision until runtime. That means any method that applies to one protocol and not the other requires the programmer to do a runtime check.
+현재 구조체가 설계된 방식은 런타임까지 프로토콜 결정을 남깁니다. 즉, 한 프로토콜에 적용되고 다른 프로토콜에는 적용되지 않는 모든 방법은 프로그래머가 런타임 검사를 수행해야 함을 의미합니다.</p>
+<p>NFS 마운트 포인트를 얻는 방법은 다음과 같습니다.</p>
+<pre><code class="language-rust ignore">struct FileDownloadRequest {
+    file_name: PathBuf,
+    authentication: AuthInfo,
+    mount_point: Option&lt;PathBuf&gt;,
+}
+
+impl FileDownloadRequest {
+    // ... other methods ...
+
+    /// Gets an NFS mount point if this is an NFS request. Otherwise,
+    /// return None.
+    pub fn mount_point(&amp;self) -&gt; Option&lt;&amp;Path&gt; {
+        self.mount_point.as_ref()
+    }
+}
+</code></pre>
+<p><code>mount_point()</code>의 모든 호출자는 <code>None</code>을 확인하고 이를 처리하는 코드를 작성해야 합니다. 이것은 NFS 요청만 주어진 코드 경로에서 사용된다는 것을 알고 있는 경우에도 마찬가지입니다!</p>
+<p>다른 요청 타입들이 혼동되는 경우 컴파일 타임에 오류를 일으키는 것이 훨씬 더 최적일 것입니다. 결국 사용자가 사용하는 라이브러리의 함수들을 포함하여 사용자 코드의 전체 경로는 요청이 NFS 요청인지 BOOTP 요청인지 알 수 있습니다.</p>
+<p>Rust에서는 이것이 실제로 가능합니다! 해결책은 API를 분할하기 위해 <em>제네릭 타입을 추가</em>하는 것입니다.</p>
+<p>여기 다음과 같습니다.</p>
+<pre><pre class="playground"><code class="language-rust edition2018">use std::path::{Path, PathBuf};
+
+mod nfs {
+    #[derive(Clone)]
+    pub(crate) struct AuthInfo(String); // NFS 세션 관리 생략
+}
+
+mod bootp {
+    pub(crate) struct AuthInfo(); // bootp에서 인증 없음
+}
+
+// private 모듈, 외부 사용자가 자신의 프로토콜 종류를 발명하지 않도록!
+mod proto_trait {
+    use std::path::{Path, PathBuf};
+    use super::{bootp, nfs};
+
+    pub(crate) trait ProtoKind {
+        type AuthInfo;
+        fn auth_info(&amp;self) -&gt; Self::AuthInfo;
+    }
+
+    pub struct Nfs {
+        auth: nfs::AuthInfo,
+        mount_point: PathBuf,
+    }
+
+    impl Nfs {
+        pub(crate) fn mount_point(&amp;self) -&gt; &amp;Path {
+            &amp;self.mount_point
+        }
+    }
+
+    impl ProtoKind for Nfs {
+        type AuthInfo = nfs::AuthInfo;
+        fn auth_info(&amp;self) -&gt; Self::AuthInfo {
+            self.auth.clone()
+        }
+    }
+
+    pub struct Bootp(); // 추가 메타데이터 없음
+
+    impl ProtoKind for Bootp {
+        type AuthInfo = bootp::AuthInfo;
+        fn auth_info(&amp;self) -&gt; Self::AuthInfo {
+            bootp::AuthInfo()
+        }
+    }
+}
+
+use proto_trait::ProtoKind; // impls를 방지하기 위해 내부적으로 유지
+pub use proto_trait::{Nfs, Bootp}; // 호출자가 그것들을 볼 수 있도록 다시 내보내기(re-export)
+
+struct FileDownloadRequest&lt;P: ProtoKind&gt; {
+    file_name: PathBuf,
+    protocol: P,
+}
+
+// 모든 공통 API 부분들은 제네릭 impl 블록으로 이동합니다.
+impl&lt;P: ProtoKind&gt; FileDownloadRequest&lt;P&gt; {
+    fn file_path(&amp;self) -&gt; &amp;Path {
+        &amp;self.file_name
+    }
+
+    fn auth_info(&amp;self) -&gt; P::AuthInfo {
+        self.protocol.auth_info()
+    }
+}
+
+// 모든 프로토콜별 impls는 자체 블록으로 이동합니다.
+impl FileDownloadRequest&lt;Nfs&gt; {
+    fn mount_point(&amp;self) -&gt; &amp;Path {
+        self.protocol.mount_point()
+    }
+}
+
+fn main() {
+    // 여기에 당신의 코드
+}
+</code></pre></pre>
+<p>이 접근 방식을 사용하면 사용자가 실수를 하여 잘못된 타입을 사용하는 경우;</p>
+<pre><code class="language-rust ignore">fn main() {
+    let mut socket = crate::bootp::listen()?;
+    while let Some(request) = socket.next_request()? {
+        match request.mount_point().as_ref()
+            &quot;/secure&quot; =&gt; socket.send(&quot;Access denied&quot;),
+            _ =&gt; {} // continue on...
+        }
+        // Rest of the code here
+    }
+}
+</code></pre>
+<p>They would get a syntax error. The type <code>FileDownloadRequest&lt;Bootp&gt;</code> does not
+implement <code>mount_point()</code>, only the type <code>FileDownloadRequest&lt;Nfs&gt;</code> does. And
+that is created by the NFS module, not the BOOTP module of course!</p>
+<h2 id="장점advantages"><a class="header" href="#장점advantages">장점(Advantages)</a></h2>
+<p>First, it allows fields that are common to multiple states to be de-duplicated.
+By making the non-shared fields generic, they are implemented once.
+첫째, 여러 상태에 공통적인 필드의 중복을 제거할 수 있습니다.
+첫째, 중복이 제거되도록 여러 상태에 공통적인 필드를 허용합니다.
+비공유(non-shared) 필드를 일반화(제네릭)하여 한 번만 구현됩니다.</p>
+<p>둘째, 상태(state)로 분류되기 때문에 <code>impl</code> 블록을 읽기 더 쉽도록 만들어줍니다. 모든 상태에 공통적인 메서드는 한 블록에 한 번 입력되고, 한 상태에 고유한 메서드는 별도의 블록에 입력됩니다.</p>
+<p>이 두 가지 모두 코드의 라인수가 더 적고 더 잘 구성되어 있음을 의미합니다.</p>
+<h2 id="단점disadvantages"><a class="header" href="#단점disadvantages">단점(Disadvantages)</a></h2>
+<p>이것은 현재 컴파일러에서 단형성(monomorphization)이 구현되는 방식으로 인해 바이너리의 크기를 증가시킵니다. 구현이 앞으로 개선될 수 있기를 바랍니다.</p>
+<h2 id="대안alternatives"><a class="header" href="#대안alternatives">대안(Alternatives)</a></h2>
+<ul>
+<li>
+<p>타입이 구성(construction)이나 부분 초기화로 인해 &quot;분할 API(split API)&quot;가 필요한 것 같으면 대신 <a href="../patterns/creational/builder.html">빌더 패턴(Builder Pattern)</a>을 고려하십시오.</p>
+</li>
+<li>
+<p>타입들 간 API가 변경되지 않고 동작만 변경되면 <a href="../patterns/behavioural/strategy.html">전략 패턴(Strategy Pattern)</a>을 대신 사용하는 것이 좋습니다.</p>
+</li>
+</ul>
+<h2 id="추가적으로-살펴보기see-also"><a class="header" href="#추가적으로-살펴보기see-also">추가적으로 살펴보기(See also)</a></h2>
+<p>이 패턴은 표준 라이브러리 전체에서 사용됩니다.</p>
+<ul>
+<li><code>Vec&lt;u8&gt;</code>은 <code>Vec&lt;T&gt;</code>의 모든 다른 타입과 달리 String으로부터 캐스팅할 수 있습니다.<sup class="footnote-reference"><a href="#1">1</a></sup></li>
+<li>바이너리 힙으로 캐스트할 수도 있지만 오직 <code>Ord</code> 트레잇을 구현하는 타입을 포함할때만 입니다.<sup class="footnote-reference"><a href="#2">2</a></sup></li>
+<li><code>to_string</code> 메소드는 <code>str</code> 타입의 <code>Cow</code>에만 특화되었습니다.<sup class="footnote-reference"><a href="#3">3</a></sup></li>
+</ul>
+<p>API 유연성을 허용하기 위해 여러 인기 있는 크레이트들에서도 사용됩니다.</p>
+<ul>
+<li>
+<p>The <code>embedded-hal</code> ecosystem used for embedded devices makes extensive use of this pattern. For example, it allows statically verifying the configuration of device registers used to control embedded pins. When a pin is put into a mode, it returns a <code>Pin&lt;MODE&gt;</code> struct, whose generic determines the functions usable in that mode, which are not on the <code>Pin</code> itself. <sup class="footnote-reference"><a href="#4">4</a></sup></p>
+</li>
+<li>
+<p>임베디드 장치에 사용되는 'embedded-hal' 생태계는 이 패턴을 광범위하게 사용합니다. 예를 들어, 임베디드 핀을 제어하는 데 사용되는 장치 레지스터의 구성을 정적으로 확인할 수 있습니다. 핀이 모드에 놓이면 <code>Pin&lt;MODE&gt;</code> 구조체를 반환합니다. 이 구조체의 제네릭은 <code>Pin</code> 자체에 없는 해당 모드에서 사용할 수 있는 기능을 결정합니다. <sup class="footnote-reference"><a href="#4">4</a></sup></p>
+</li>
+<li>
+<p>The <code>hyper</code> HTTP client library uses this to expose rich APIs for different pluggable requests. Clients with different connectors have different methods on them as well as different trait implementations, while a core set of methods apply to any connector. <sup class="footnote-reference"><a href="#5">5</a></sup></p>
+</li>
+<li>
+<p><code>hyper</code> HTTP 클라이언트 라이브러리는 다른 연결 가능한 요청에 대한 풍부한 API를 노출하기 위해서 이것을 사용합니다. 다른 커넥터를 갖는 클라이언트는 다른 트레잇 구현뿐만 아니라 다른 방법을 사용하는 반면, 방법의 핵심 세트는 모든 커넥터에 적용됩니다. <sup class="footnote-reference"><a href="#5">5</a></sup></p>
+</li>
+<li>
+<p>객체가 내부 상태 또는 불변성을 기반으로 API를 얻거나 잃는 &quot;타입 상태(type state)&quot; 패턴은 동일한 기본 개념과 약간 다른 기술을 사용하여 Rust에서 구현됩니다. <sup class="footnote-reference"><a href="#6">6</a></sup></p>
+</li>
+</ul>
+<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
+<p><a href="https://doc.rust-lang.org/stable/src/std/ffi/c_str.rs.html#799-801">impl From&lt;CString&gt; for Vec&lt;u8&gt;</a>를 보세요.</p>
+</div>
+<div class="footnote-definition" id="2"><sup class="footnote-definition-label">2</sup>
+<p><a href="https://doc.rust-lang.org/stable/src/alloc/collections/binary_heap.rs.html#1345-1354">impl&lt;T&gt; From&lt;Vec&lt;T, Global&gt;&gt; for BinaryHeap&lt;T&gt;</a>를 보세요.</p>
+</div>
+<div class="footnote-definition" id="3"><sup class="footnote-definition-label">3</sup>
+<p><a href="https://doc.rust-lang.org/stable/src/alloc/string.rs.html#2235-2240">impl&lt;'_&gt; ToString for Cow&lt;'_, str&gt;</a>를 보세요.</p>
+</div>
+<div class="footnote-definition" id="4"><sup class="footnote-definition-label">4</sup>
+<p>예제: <a href="https://docs.rs/stm32f30x-hal/0.1.0/stm32f30x_hal/gpio/gpioa/struct.PA0.html">https://docs.rs/stm32f30x-hal/0.1.0/stm32f30x_hal/gpio/gpioa/struct.PA0.html</a></p>
+</div>
+<div class="footnote-definition" id="5"><sup class="footnote-definition-label">5</sup>
+<p><a href="https://docs.rs/hyper/0.14.5/hyper/client/struct.Client.html">https://docs.rs/hyper/0.14.5/hyper/client/struct.Client.html</a> 를 보세요.</p>
+</div>
+<div class="footnote-definition" id="6"><sup class="footnote-definition-label">6</sup>
+<p><a href="https://web.archive.org/web/20210325065112/https://www.novatec-gmbh.de/en/blog/the-case-for-the-typestate-pattern-the-typestate-pattern-itself/">The Case for the Type State Pattern</a>
+과
+<a href="https://web.archive.org/web/20210328164854/https://rustype.github.io/notes/notes/rust-typestate-series/rust-typestate-index">Rusty Typestate Series (an extensive thesis)</a>
+를 보세요.</p>
+</div>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../functional/paradigms.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../additional_resources/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../functional/paradigms.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../additional_resources/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>
